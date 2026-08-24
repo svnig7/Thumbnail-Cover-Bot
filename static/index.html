@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMDB Posters — Send to Bot PM as Cover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14161c;
+    --bg-raised: #1c1f27;
+    --gold: #e8b44a;
+    --gold-dim: #a5813a;
+    --velvet: #7a2036;
+    --velvet-border: #a64a5f;
+    --paper: #f2efe9;
+    --slate: #8b8f9a;
+    --slate-dim: #565b66;
+    --positive: #4c9a6a;
+    --danger: #c0463c;
+    --border: #2a2e38;
+    --input-bg: #0f1116;
+    --input-border: #2f3340;
+    --sprocket-bg: #26292f;
+    --sprocket-dot: #0f1116;
+    --page-grad-1: #1d2029;
+    --page-grad-2: #14161c;
+    --marquee-grad-1: #1a1d24;
+    --marquee-grad-2: #14161c;
+    --overlay: rgba(10,11,14,0.72);
+    --on-gold: #14161c;
+    --radius: 6px;
+  }
+  html[data-theme="light"]{
+    --bg: #f5f1e8;
+    --bg-raised: #ffffff;
+    --gold: #b8842e;
+    --gold-dim: #8a6224;
+    --velvet: #7a2036;
+    --velvet-border: #b5556a;
+    --paper: #241f1a;
+    --slate: #6b6558;
+    --slate-dim: #a39c8c;
+    --positive: #2f7a4f;
+    --danger: #a83226;
+    --border: #e3dac4;
+    --input-bg: #faf7ef;
+    --input-border: #e3dac4;
+    --sprocket-bg: #e7ddc4;
+    --sprocket-dot: #f5f1e8;
+    --page-grad-1: #fffdf7;
+    --page-grad-2: #f5f1e8;
+    --marquee-grad-1: #fffdf7;
+    --marquee-grad-2: #f5f1e8;
+    --overlay: rgba(40,34,24,0.55);
+    --on-gold: #fffaf0;
+  }
+  html[data-theme="neon"]{
+    --bg: #05060c;
+    --bg-raised: #0d0f1c;
+    --gold: #05e6ff;
+    --gold-dim: #0092a8;
+    --velvet: #ff2ec4;
+    --velvet-border: #ff7fe0;
+    --paper: #eef1ff;
+    --slate: #7c86ad;
+    --slate-dim: #3d4262;
+    --positive: #39ffa0;
+    --danger: #ff3b5c;
+    --border: #20243c;
+    --input-bg: #090b14;
+    --input-border: #262b47;
+    --sprocket-bg: #0e1020;
+    --sprocket-dot: #05060c;
+    --page-grad-1: #12152e;
+    --page-grad-2: #05060c;
+    --marquee-grad-1: #12152e;
+    --marquee-grad-2: #05060c;
+    --overlay: rgba(4,5,14,0.78);
+    --on-gold: #05060c;
+    --glow-accent: 0 0 14px rgba(5,230,255,0.55), 0 0 30px rgba(5,230,255,0.22);
+    --glow-secondary: 0 0 14px rgba(255,46,196,0.55), 0 0 30px rgba(255,46,196,0.22);
+  }
+  html[data-theme="neon"] .marquee{
+    box-shadow: 0 1px 0 var(--gold), var(--glow-accent);
+  }
+  html[data-theme="neon"] .marquee h1 a{
+    text-shadow: 0 0 10px rgba(5,230,255,0.85), 0 0 30px rgba(5,230,255,0.4);
+  }
+  html[data-theme="neon"] .marquee .eyebrow{
+    text-shadow: 0 0 8px rgba(255,46,196,0.5);
+  }
+  html[data-theme="neon"] .marquee::before,
+  html[data-theme="neon"] .marquee::after{
+    background-image: radial-gradient(circle, var(--velvet) 2.5px, transparent 2.6px);
+    opacity:0.85;
+    filter: drop-shadow(0 0 4px rgba(255,46,196,0.55));
+  }
+  html[data-theme="neon"] .btn-primary{ box-shadow: var(--glow-accent); }
+  html[data-theme="neon"] .btn-primary:hover{ box-shadow: 0 0 20px rgba(5,230,255,0.8), 0 0 44px rgba(5,230,255,0.35); }
+  html[data-theme="neon"] .mode-btn.active{ box-shadow: var(--glow-accent); }
+  html[data-theme="neon"] .board input:focus,
+  html[data-theme="neon"] .id-type-select:focus{ box-shadow: var(--glow-accent); }
+  html[data-theme="neon"] .frame{ transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+  html[data-theme="neon"] .frame:hover{ border-color: var(--gold); box-shadow: var(--glow-accent); }
+  html[data-theme="neon"] .frame .send{ background: linear-gradient(135deg, var(--velvet), #7a2ee0); }
+  html[data-theme="neon"] .frame .send:hover{ box-shadow: var(--glow-secondary); }
+  html[data-theme="neon"] .modal{ box-shadow: 0 0 44px rgba(5,230,255,0.16), 0 12px 40px rgba(0,0,0,0.55); }
+  html[data-theme="neon"] .theme-toggle{ box-shadow: var(--glow-accent); }
+  html[data-theme="neon"] .footer-tg{ box-shadow: 0 0 10px rgba(5,230,255,0.4); }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse at top, var(--page-grad-1) 0%, var(--page-grad-2) 55%);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom: 4rem;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+  a{color:var(--gold);}
+
+  .theme-toggle{
+    position:fixed;
+    top:1rem; right:1rem;
+    z-index:60;
+    width:40px; height:40px;
+    border-radius:50%;
+    background: var(--bg-raised);
+    border:1px solid var(--border);
+    color: var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease, background-color 0.25s ease, border-color 0.25s ease;
+  }
+  .theme-toggle:hover{ transform: scale(1.06); }
+  .theme-toggle:active{ transform: scale(0.94); }
+  .theme-toggle svg{ width:18px; height:18px; }
+
+  .marquee{
+    position:relative;
+    background: linear-gradient(180deg, var(--marquee-grad-1) 0%, var(--marquee-grad-2) 100%);
+    border-bottom: 3px solid var(--gold-dim);
+    padding: 2.25rem 1.5rem 1.75rem;
+    text-align:center;
+    overflow:hidden;
+    transition: background-color 0.25s ease;
+  }
+  .marquee::before, .marquee::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height:10px;
+    background-image: radial-gradient(circle, var(--gold) 2.5px, transparent 2.6px);
+    background-size: 22px 10px;
+    background-repeat: repeat-x;
+    opacity:0.55;
+  }
+  .marquee::before{ top:6px; }
+  .marquee::after{ bottom:6px; }
+  .marquee h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: 0.08em;
+    margin: 0.25rem 0 0.15rem;
+  }
+  .marquee h1 a{
+    color: var(--paper);
+    text-decoration:none;
+    text-shadow: 0 0 18px rgba(232,180,74,0.25);
+    transition: text-shadow 0.2s ease, opacity 0.15s ease;
+  }
+  .marquee h1 a:hover{ text-shadow: 0 0 26px rgba(232,180,74,0.45); opacity:0.9; }
+  .marquee .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.3em;
+    color: var(--gold);
+    text-transform:uppercase;
+  }
+  .marquee p.tagline{
+    color: var(--slate);
+    font-size:0.92rem;
+    max-width: 34rem;
+    margin: 0.5rem auto 0;
+  }
+
+  .wrap{ max-width: 960px; margin: 0 auto; padding: 0 1.25rem; }
+
+  button{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:0.85rem;
+    border-radius:4px;
+    border:1px solid transparent;
+    padding:0.55rem 1rem;
+    cursor:pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease, background-color 0.2s ease;
+  }
+  button:active{ transform: scale(0.97); }
+  button:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+  .btn-primary{ background: var(--gold); color: var(--on-gold); }
+  .btn-primary:hover{ filter: brightness(1.08); }
+  .btn-ghost{ background:transparent; color:var(--slate); border-color: var(--border); }
+  .btn-ghost:hover{ color:var(--paper); border-color:var(--slate-dim); }
+
+  .mode-toggle{
+    margin-top: 1.75rem;
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+  }
+  .mode-btn{
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--slate);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding: 0.4rem 0.8rem;
+  }
+  .mode-btn:hover{ color: var(--paper); border-color: var(--slate-dim); }
+  .mode-btn.active{ background: var(--gold); color: var(--on-gold); border-color: var(--gold); }
+
+  .board{
+    margin-top:0.6rem;
+    display:flex;
+    gap:0.6rem;
+  }
+  .input-wrap{
+    position:relative;
+    flex:1;
+    display:flex;
+  }
+  .board input{
+    flex:1;
+    width:100%;
+    background: var(--bg-raised);
+    border:1px solid var(--border);
+    color: var(--paper);
+    font-size:1.05rem;
+    padding:0.8rem 2.6rem 0.8rem 1rem;
+    border-radius: var(--radius);
+  }
+  .board input:focus{ outline:2px solid var(--gold-dim); outline-offset:1px; }
+  .board input::placeholder{ color: var(--slate-dim); }
+
+  .clear-btn{
+    position:absolute;
+    right:0.4rem; top:50%;
+    transform: translateY(-50%);
+    width:28px; height:28px;
+    border-radius:50%;
+    background:transparent;
+    border:none;
+    color: var(--slate);
+    font-size:1rem;
+    line-height:1;
+    padding:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .clear-btn:hover{ color: var(--paper); background: var(--border); }
+  .clear-btn:active{ transform: translateY(-50%) scale(0.9); }
+
+  .id-type-select{
+    background: var(--bg-raised);
+    border:1px solid var(--border);
+    color: var(--paper);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.85rem;
+    padding: 0 0.7rem;
+    border-radius: var(--radius);
+  }
+  .id-type-select:focus{ outline:2px solid var(--gold-dim); outline-offset:1px; }
+
+  #status-line{
+    margin-top:0.7rem;
+    font-size:0.82rem;
+    font-family:'JetBrains Mono', monospace;
+    color: var(--slate);
+    min-height: 1.1em;
+  }
+  #status-line.err{ color: var(--danger); }
+  #status-line.ok{ color: var(--positive); }
+
+  .filmstrip{
+    margin-top:1.5rem;
+    position:relative;
+    padding: 12px 0;
+  }
+  .filmstrip::before, .filmstrip::after{
+    content:"";
+    display:block;
+    height:12px;
+    background-image: radial-gradient(circle, var(--sprocket-dot) 3px, transparent 3.2px);
+    background-size: 26px 12px;
+    background-repeat: repeat-x;
+    background-color: var(--sprocket-bg);
+  }
+  .filmstrip::before{ margin-bottom: 10px; }
+  .filmstrip::after{ margin-top: 10px; }
+
+  .frames{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.1rem;
+    background: var(--sprocket-bg);
+    padding: 0.5rem;
+  }
+  .frame{
+    background: var(--bg-raised);
+    border: 1px solid var(--input-border);
+    border-radius: 3px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .frame:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+  }
+  .frame .poster{
+    aspect-ratio: 2/3;
+    background: var(--input-bg) center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--slate-dim);
+    font-size:0.75rem;
+    text-align:center;
+    padding:0.5rem;
+  }
+  .frame .meta{ padding:0.6rem 0.65rem 0.7rem; flex:1; display:flex; flex-direction:column; gap:0.3rem; }
+  .frame .title{ font-size:0.88rem; font-weight:600; line-height:1.25; }
+  .frame .sub{ font-size:0.72rem; color: var(--slate); font-family:'JetBrains Mono', monospace; }
+  .frame .send{
+    margin-top:auto;
+    position:relative;
+    background: var(--velvet);
+    color: #f2efe9;
+    border:1px dashed var(--velvet-border);
+    font-size:0.75rem;
+    padding:0.5rem 0.6rem;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+  }
+  .frame .send:hover{ filter: brightness(1.12); }
+  .frame .send:disabled{ opacity:0.5; cursor:default; }
+  .frame .send.sent{ background: var(--positive); border-color:#6bb98a; color:#0f1116; }
+  .frame .send.failed{ background: var(--danger); border-color:#d97a71; }
+
+  .empty{
+    text-align:center;
+    color: var(--slate-dim);
+    padding: 2.5rem 1rem;
+    font-size:0.9rem;
+  }
+
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background: var(--overlay);
+    backdrop-filter: blur(2px);
+    display:flex; align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+    padding: 0;
+  }
+  .modal-backdrop[hidden]{ display:none; }
+  @media (min-width: 640px){
+    .modal-backdrop{ align-items:center; padding: 1.5rem; }
+  }
+  .modal{
+    background: var(--bg-raised);
+    border: 1px solid var(--input-border);
+    border-top: 3px solid var(--gold);
+    width:100%;
+    max-width: 480px;
+    max-height: 85vh;
+    display:flex;
+    flex-direction:column;
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  }
+  @media (min-width: 640px){
+    .modal{ border-radius: var(--radius); max-height: 80vh; }
+  }
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1rem 1.1rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-header h2{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.04em;
+    font-size:1.35rem;
+    margin:0;
+    color: var(--paper);
+  }
+  .modal-header .modal-sub{
+    font-size:0.72rem;
+    color:var(--slate);
+    font-family:'JetBrains Mono', monospace;
+    margin-top:0.15rem;
+  }
+  .modal-close{
+    background:transparent; border:none; color:var(--slate);
+    font-size:1.4rem; line-height:1; padding:0.2rem 0.4rem;
+    cursor:pointer;
+  }
+  .modal-close:hover{ color:var(--paper); }
+  .modal-body{
+    overflow-y:auto;
+    padding: 0.4rem 0.6rem;
+    flex:1;
+  }
+  .modal-body .loading, .modal-body .modal-error{
+    padding: 1.5rem 1rem; text-align:center; color: var(--slate); font-size:0.85rem;
+  }
+  .modal-error{ color: var(--danger) !important; }
+  .season-row{
+    display:flex; align-items:center; gap:0.7rem;
+    padding: 0.55rem 0.5rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .season-row:last-child{ border-bottom:none; }
+  .season-row .season-thumb{
+    width:40px; height:60px; flex-shrink:0;
+    background: var(--input-bg) center/cover no-repeat;
+    border-radius:2px;
+    border:1px solid var(--input-border);
+  }
+  .season-row .season-info{ flex:1; min-width:0; }
+  .season-row .season-name{ font-size:0.85rem; font-weight:600; }
+  .season-row .season-meta{ font-size:0.7rem; color:var(--slate); font-family:'JetBrains Mono', monospace; margin-top:0.15rem; }
+  .season-row input[type="checkbox"]{
+    width:18px; height:18px; accent-color: var(--gold);
+    flex-shrink:0; cursor:pointer;
+  }
+  .season-row.season-row-disabled{ opacity:0.45; }
+  .modal-footer{
+    padding: 0.8rem 1.1rem;
+    border-top: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:0.6rem;
+    flex-wrap:wrap;
+  }
+  .modal-select-actions{ display:flex; gap:0.5rem; }
+  .modal-select-actions button{ font-size:0.72rem; padding:0.4rem 0.6rem; }
+  #season-send-btn{ font-size:0.8rem; }
+  .modal-status{
+    padding: 0 1.1rem 0.9rem;
+    font-size:0.78rem;
+    font-family:'JetBrains Mono', monospace;
+    color: var(--slate);
+    min-height:1.1em;
+  }
+  .modal-status.err{ color: var(--danger); }
+  .modal-status.ok{ color: var(--positive); }
+
+  footer{
+    max-width:960px; margin: 2.5rem auto 0; padding: 0 1.25rem;
+    color: var(--slate-dim); font-size:0.75rem; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:0.7rem;
+  }
+  footer a{ color: var(--slate); }
+  .footer-tg{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%;
+    background: var(--bg-raised);
+    border:1px solid var(--border);
+    color: var(--gold);
+    transition: transform 0.15s ease, border-color 0.2s ease;
+  }
+  .footer-tg:hover{ transform: scale(1.08); border-color: var(--gold-dim); }
+  .footer-tg svg{ width:17px; height:17px; }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme">
+  <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden>
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+  </svg>
+  <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+  <svg id="icon-bolt" viewBox="0 0 24 24" fill="currentColor" hidden>
+    <path d="M13 2 3 14h7l-1 8 11-14h-7l0-6z"></path>
+  </svg>
+</button>
+
+<div class="marquee">
+  <div class="eyebrow">Reel · Frame · Send</div>
+  <h1><a href="/">TMDB Posters</a></h1>
+  <p class="tagline">Search TMDb, pull the poster, and drop it in your bot's DM as the next video's cover.</p>
+</div>
+
+<div class="wrap">
+
+  <div class="mode-toggle" id="mode-toggle">
+    <button type="button" class="mode-btn active" data-mode="title">Title</button>
+    <button type="button" class="mode-btn" data-mode="tmdbid">TMDb ID</button>
+    <button type="button" class="mode-btn" data-mode="imdbid">IMDb ID</button>
+  </div>
+
+  <form class="board" id="search-form">
+    <select id="id-type-select" class="id-type-select" hidden aria-label="Media type">
+      <option value="movie">Movie</option>
+      <option value="tv">TV</option>
+    </select>
+    <div class="input-wrap">
+      <input id="search-input" type="text" placeholder="Search a movie or show… (add a year, e.g. &quot;RRR 2022&quot;)" autocomplete="off">
+      <button type="button" class="clear-btn" id="input-clear-btn" hidden aria-label="Clear search">×</button>
+    </div>
+    <button class="btn-primary" type="submit">Search</button>
+  </form>
+  <div id="status-line"></div>
+
+  <div class="filmstrip" id="filmstrip" hidden>
+    <div class="frames" id="frames"></div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Posters via <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDb</a>. Delivered privately to the bot's PM and saved as your next video cover. This product uses the TMDb API but is not endorsed or certified by TMDb.</span>
+  <a class="footer-tg" href="https://t.me/stremio_updates" target="_blank" rel="noopener" aria-label="Telegram updates channel">
+    <svg viewBox="0 0 240 240" fill="none">
+      <circle cx="120" cy="120" r="120" fill="currentColor" opacity="0.12"/>
+      <path fill="currentColor" d="M179.6 66.6 156.9 179c-1.7 8-6.3 9.9-12.7 6.2l-35-25.8-16.9 16.3c-1.9 1.9-3.4 3.4-7 3.4l2.5-35.9L154 79.3c3.4-3-.7-4.7-5.2-1.7l-83.2 52.4-35.8-11.2c-7.8-2.4-7.9-7.8 1.6-11.6l140-53.9c6.5-2.4 12.2 1.5 8.2 12.3z"/>
+    </svg>
+  </a>
+</footer>
+
+<div class="modal-backdrop" id="season-modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="season-modal-title">
+    <div class="modal-header">
+      <div>
+        <h2 id="season-modal-title">Choose seasons</h2>
+        <div class="modal-sub" id="season-modal-sub"></div>
+      </div>
+      <button class="modal-close" id="season-modal-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="season-modal-body">
+      <div class="loading">Loading seasons…</div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-select-actions">
+        <button class="btn-ghost" id="season-select-all" type="button">Select all</button>
+        <button class="btn-ghost" id="season-select-none" type="button">Select none</button>
+      </div>
+      <button class="btn-primary" id="season-send-btn" type="button" disabled>Send selected (0)</button>
+    </div>
+    <div class="modal-status" id="season-modal-status"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const statusLine = $('status-line');
+  const frames = $('frames');
+  const filmstrip = $('filmstrip');
+  const searchForm = $('search-form');
+  const searchInput = $('search-input');
+  const inputClearBtn = $('input-clear-btn');
+  const modeToggle = $('mode-toggle');
+  const modeButtons = Array.from(modeToggle.querySelectorAll('.mode-btn'));
+  const idTypeSelect = $('id-type-select');
+
+  const seasonBackdrop = $('season-modal-backdrop');
+  const seasonModalTitle = $('season-modal-title');
+  const seasonModalSub = $('season-modal-sub');
+  const seasonModalBody = $('season-modal-body');
+  const seasonModalStatus = $('season-modal-status');
+  const seasonModalClose = $('season-modal-close');
+  const seasonSelectAllBtn = $('season-select-all');
+  const seasonSelectNoneBtn = $('season-select-none');
+  const seasonSendBtn = $('season-send-btn');
+
+  const themeToggleBtn = $('theme-toggle');
+  const iconSun = $('icon-sun');
+  const iconMoon = $('icon-moon');
+  const iconBolt = $('icon-bolt');
+
+  const THEME_KEY = 'tmdb_tg_theme_v1';
+  const THEME_ORDER = ['dark', 'neon', 'light'];
+  const THEME_LABELS = { dark: 'cinema', neon: 'neon', light: 'paper' };
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    iconSun.hidden = theme !== 'light';
+    iconMoon.hidden = theme !== 'dark';
+    iconBolt.hidden = theme !== 'neon';
+    const nextTheme = THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length];
+    themeToggleBtn.setAttribute('aria-label', `Switch to ${THEME_LABELS[nextTheme]} theme`);
+  }
+  function loadTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    if(THEME_ORDER.includes(saved)) return saved;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  let currentTheme = loadTheme();
+  applyTheme(currentTheme);
+  themeToggleBtn.addEventListener('click', () => {
+    currentTheme = THEME_ORDER[(THEME_ORDER.indexOf(currentTheme) + 1) % THEME_ORDER.length];
+    localStorage.setItem(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+  });
+
+  function setStatus(msg, kind){
+    statusLine.textContent = msg || '';
+    statusLine.className = kind || '';
+  }
+
+  function posterUrl(path, size){
+    return path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
+  }
+
+  function updateClearBtn(){
+    inputClearBtn.hidden = !searchInput.value;
+  }
+  searchInput.addEventListener('input', updateClearBtn);
+  inputClearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    updateClearBtn();
+    setStatus('');
+    frames.innerHTML = '';
+    filmstrip.hidden = true;
+    searchInput.focus();
+  });
+
+  let currentMode = 'title';
+
+  function setMode(mode){
+    currentMode = mode;
+    modeButtons.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    idTypeSelect.hidden = mode !== 'tmdbid';
+    if(mode === 'tmdbid'){
+      searchInput.placeholder = 'e.g. 27205';
+      searchInput.setAttribute('inputmode', 'numeric');
+    } else if(mode === 'imdbid'){
+      searchInput.placeholder = 'e.g. tt1160419';
+      searchInput.removeAttribute('inputmode');
+    } else {
+      searchInput.placeholder = 'Search a movie or show… (add a year, e.g. "RRR 2022")';
+      searchInput.removeAttribute('inputmode');
+    }
+    searchInput.value = '';
+    updateClearBtn();
+    setStatus('');
+    frames.innerHTML = '';
+    filmstrip.hidden = true;
+    searchInput.focus();
+  }
+
+  modeButtons.forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  async function apiGet(path){
+    const res = await fetch(path);
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error || `Server responded ${res.status}`);
+    return data;
+  }
+
+  async function apiPost(path, body){
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok && res.status !== 207) throw new Error(data.error || `Server responded ${res.status}`);
+    return data;
+  }
+
+  async function runSearch(query){
+    setStatus('Searching…');
+    frames.innerHTML = '';
+    filmstrip.hidden = true;
+    try{
+      const data = await apiGet(`/api/search?q=${encodeURIComponent(query)}`);
+      const results = data.results || [];
+      if(results.length === 0){
+        setStatus(`No movies or shows found for "${query}".`, '');
+        return;
+      }
+      if(data.mode === 'year'){
+        setStatus(`${results.length} result${results.length === 1 ? '' : 's'} for "${data.title}" (${data.year}).`, 'ok');
+      } else {
+        setStatus(`${results.length} result${results.length === 1 ? '' : 's'} for "${query}".`, 'ok');
+      }
+      renderResults(results);
+    }catch(err){
+      setStatus(`Search error: ${err.message}`, 'err');
+    }
+  }
+
+  async function runIdLookup(rawId, mediaType){
+    const id = rawId.trim();
+    if(!/^\d+$/.test(id)){
+      setStatus('TMDb ID must be a whole number (e.g. 27205).', 'err');
+      return;
+    }
+    setStatus('Looking up TMDb ID…');
+    frames.innerHTML = '';
+    filmstrip.hidden = true;
+    try{
+      const data = await apiGet(`/api/lookup?type=tmdbid&id=${encodeURIComponent(id)}&mediaType=${encodeURIComponent(mediaType)}`);
+      const results = data.results || [];
+      const displayTitle = (results[0] && (results[0].title || results[0].name)) || 'Untitled';
+      setStatus(`Found "${displayTitle}" (TMDb ID ${id}).`, 'ok');
+      renderResults(results);
+    }catch(err){
+      setStatus(`Lookup error: ${err.message}`, 'err');
+    }
+  }
+
+  async function runImdbLookup(rawId){
+    const id = rawId.trim();
+    if(!/^tt\d{6,9}$/i.test(id)){
+      setStatus('IMDb ID should look like tt1160419.', 'err');
+      return;
+    }
+    setStatus('Looking up IMDb ID…');
+    frames.innerHTML = '';
+    filmstrip.hidden = true;
+    try{
+      const data = await apiGet(`/api/lookup?type=imdbid&id=${encodeURIComponent(id)}`);
+      const results = data.results || [];
+      if(results.length === 0){
+        setStatus(`No movie or show found for IMDb ID ${id}.`, '');
+        return;
+      }
+      setStatus(`Found ${results.length} match${results.length === 1 ? '' : 'es'} for IMDb ID ${id}.`, 'ok');
+      renderResults(results);
+    }catch(err){
+      setStatus(`Lookup error: ${err.message}`, 'err');
+    }
+  }
+
+  function renderResults(results){
+    frames.innerHTML = '';
+    results.forEach(item => {
+      const title = item.title || item.name || 'Untitled';
+      const dateStr = item.release_date || item.first_air_date || '';
+      const year = dateStr ? dateStr.slice(0,4) : '—';
+      const isTv = item.media_type === 'tv';
+      const kind = isTv ? 'TV' : 'Movie';
+      const thumb = posterUrl(item.poster_path, 'w342');
+
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+
+      const poster = document.createElement('div');
+      poster.className = 'poster';
+      if(thumb){
+        poster.style.backgroundImage = `url('${thumb}')`;
+      } else {
+        poster.textContent = 'No poster available';
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `
+        <div class="title">${escapeHtml(title)}</div>
+        <div class="sub">${kind} · ${year}</div>
+      `;
+
+      const sendBtn = document.createElement('button');
+      sendBtn.className = 'send';
+      if(isTv){
+        sendBtn.textContent = 'Select seasons';
+        sendBtn.disabled = false;
+        sendBtn.addEventListener('click', () => openSeasonPicker(item, title));
+      } else {
+        const hasPoster = !!item.poster_path;
+        sendBtn.textContent = hasPoster ? 'Send to bot PM' : 'No poster to send';
+        sendBtn.disabled = !hasPoster;
+        sendBtn.addEventListener('click', () => sendMovieToTelegram(sendBtn, item, title));
+      }
+
+      meta.appendChild(sendBtn);
+      frame.appendChild(poster);
+      frame.appendChild(meta);
+      frames.appendChild(frame);
+    });
+    filmstrip.hidden = false;
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function sleep(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function sendMovieToTelegram(btn, item, title){
+    btn.disabled = true;
+    btn.classList.remove('sent','failed');
+    const original = btn.textContent;
+    btn.textContent = 'Sending…';
+    try{
+      const data = await apiPost('/api/send', { media_type: 'movie', id: item.id });
+      if(!data.ok) throw new Error((data.results && data.results.find(r=>!r.ok) || {}).error || 'Delivery failed for one or more destinations.');
+      btn.textContent = 'Saved ✓';
+      btn.classList.add('sent');
+      setStatus(data.stretched
+        ? `Sent "${title}" (1280×720) to your bot's PM — saved as cover.`
+        : `Sent "${title}" to your bot's PM — saved as cover (not stretched).`, 'ok');
+    }catch(err){
+      btn.textContent = 'Failed — retry';
+      btn.classList.add('failed');
+      btn.disabled = false;
+      setStatus(`Error: ${err.message}`, 'err');
+      return;
+    }
+    setTimeout(()=>{
+      btn.disabled = false;
+      btn.textContent = original;
+      btn.classList.remove('sent');
+    }, 2500);
+  }
+
+  let seasonPickerState = null;
+
+  function closeSeasonPicker(){
+    if(seasonPickerState && seasonPickerState.sending) return;
+    seasonBackdrop.hidden = true;
+    seasonPickerState = null;
+    seasonModalStatus.textContent = '';
+    seasonModalStatus.className = 'modal-status';
+  }
+
+  function updateSeasonSendCount(){
+    const checked = seasonModalBody.querySelectorAll('input[type="checkbox"]:checked').length;
+    seasonSendBtn.textContent = `Send selected (${checked})`;
+    seasonSendBtn.disabled = checked === 0;
+  }
+
+  async function openSeasonPicker(item, title){
+    seasonPickerState = { item, title, details: null, seasons: [], sending: false };
+    seasonModalTitle.textContent = title;
+    seasonModalSub.textContent = 'Loading seasons…';
+    seasonModalBody.innerHTML = '<div class="loading">Loading seasons…</div>';
+    seasonModalStatus.textContent = '';
+    seasonModalStatus.className = 'modal-status';
+    seasonSendBtn.disabled = true;
+    seasonSendBtn.textContent = 'Send selected (0)';
+    seasonBackdrop.hidden = false;
+
+    try{
+      const details = await apiGet(`/api/details?type=tv&id=${item.id}`);
+      const seasons = (details.seasons || []).filter(sn => sn.season_number > 0);
+
+      if(!seasonPickerState || seasonPickerState.item !== item) return;
+      seasonPickerState.details = details;
+      seasonPickerState.seasons = seasons;
+
+      if(seasons.length === 0){
+        seasonModalBody.innerHTML = '<div class="modal-error">No numbered seasons found for this show.</div>';
+        seasonModalSub.textContent = '';
+        return;
+      }
+
+      seasonModalSub.textContent = `${seasons.length} season${seasons.length === 1 ? '' : 's'} · pick which to send`;
+      renderSeasonRows(details, seasons);
+    }catch(err){
+      seasonModalBody.innerHTML = `<div class="modal-error">${escapeHtml(err.message)}</div>`;
+      seasonModalSub.textContent = '';
+    }
+  }
+
+  function renderSeasonRows(details, seasons){
+    seasonModalBody.innerHTML = '';
+    seasons.forEach(season => {
+      const posterPath = season.poster_path || details.poster_path;
+      const thumb = posterUrl(posterPath, 'w154');
+
+      const row = document.createElement('label');
+      row.className = 'season-row';
+      if(!thumb) row.classList.add('season-row-disabled');
+
+      const thumbEl = document.createElement('div');
+      thumbEl.className = 'season-thumb';
+      if(thumb) thumbEl.style.backgroundImage = `url('${thumb}')`;
+
+      const info = document.createElement('div');
+      info.className = 'season-info';
+      const epCount = typeof season.episode_count === 'number' ? `${season.episode_count} eps` : '';
+      const airYear = season.air_date ? season.air_date.slice(0,4) : '—';
+      info.innerHTML = `
+        <div class="season-name">Season ${season.season_number}${season.name && season.name !== `Season ${season.season_number}` ? ' — ' + escapeHtml(season.name) : ''}</div>
+        <div class="season-meta">${airYear}${epCount ? ' · ' + epCount : ''}${thumb ? '' : ' · no poster, will be skipped'}</div>
+      `;
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.dataset.seasonNumber = String(season.season_number);
+      cb.disabled = !thumb;
+      cb.checked = false;
+      cb.addEventListener('change', updateSeasonSendCount);
+
+      row.appendChild(thumbEl);
+      row.appendChild(info);
+      row.appendChild(cb);
+      seasonModalBody.appendChild(row);
+    });
+    updateSeasonSendCount();
+  }
+
+  seasonSelectAllBtn.addEventListener('click', () => {
+    seasonModalBody.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(cb => { cb.checked = true; });
+    updateSeasonSendCount();
+  });
+  seasonSelectNoneBtn.addEventListener('click', () => {
+    seasonModalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+    updateSeasonSendCount();
+  });
+  seasonModalClose.addEventListener('click', closeSeasonPicker);
+  seasonBackdrop.addEventListener('click', (e) => {
+    if(e.target === seasonBackdrop) closeSeasonPicker();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && !seasonBackdrop.hidden) closeSeasonPicker();
+  });
+
+  seasonSendBtn.addEventListener('click', async () => {
+    if(!seasonPickerState || seasonPickerState.sending) return;
+    const { item, title } = seasonPickerState;
+    const checkedBoxes = Array.from(seasonModalBody.querySelectorAll('input[type="checkbox"]:checked'));
+    const selectedNumbers = checkedBoxes.map(cb => Number(cb.dataset.seasonNumber));
+    const selectedSeasons = seasonPickerState.seasons.filter(sn => selectedNumbers.includes(sn.season_number));
+    if(selectedSeasons.length === 0) return;
+
+    seasonPickerState.sending = true;
+    seasonSendBtn.disabled = true;
+    seasonSelectAllBtn.disabled = true;
+    seasonSelectNoneBtn.disabled = true;
+    seasonModalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = true; });
+
+    let sent = 0, failed = 0;
+    for(let i = 0; i < selectedSeasons.length; i++){
+      const season = selectedSeasons[i];
+      seasonModalStatus.textContent = `Sending ${i + 1}/${selectedSeasons.length} — Season ${season.season_number}…`;
+      seasonModalStatus.className = 'modal-status';
+      try{
+        const data = await apiPost('/api/send', { media_type: 'tv', id: item.id, season_number: season.season_number });
+        if(data.ok) sent++; else failed++;
+      }catch(e){
+        failed++;
+      }
+      if(i < selectedSeasons.length - 1) await sleep(1200);
+    }
+
+    const parts = [`Saved ${sent} season cover${sent === 1 ? '' : 's'} of "${title}" to your bot's PM`];
+    if(failed) parts.push(`${failed} failed`);
+    seasonModalStatus.textContent = parts.join(' — ') + '.';
+    seasonModalStatus.className = failed ? 'modal-status err' : 'modal-status ok';
+    setStatus(parts.join(' — ') + '.', failed ? 'err' : 'ok');
+
+    seasonPickerState.sending = false;
+    seasonSelectAllBtn.disabled = false;
+    seasonSelectNoneBtn.disabled = false;
+    seasonModalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const rowDisabled = cb.closest('.season-row').classList.contains('season-row-disabled');
+      cb.disabled = rowDisabled;
+    });
+    updateSeasonSendCount();
+  });
+
+  searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const val = searchInput.value.trim();
+    if(!val) return;
+    if(currentMode === 'tmdbid') runIdLookup(val, idTypeSelect.value);
+    else if(currentMode === 'imdbid') runImdbLookup(val);
+    else runSearch(val);
+  });
+})();
+</script>
+</body>
+</html>
